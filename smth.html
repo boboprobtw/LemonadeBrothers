@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Self-Service Ordering System</title>
+ <style>
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+  #menu {
+    display: flex;
+    justify-content: center;
+  }
+  .item {
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin: 10px;
+    border: 1px solid #000;
+    padding: 10px;
+    border-radius: 10px;
+  }
+  .item:hover {
+    transform: scale(1.1);
+  }
+  .quantity-controls {
+    display: flex;
+    align-items: center;
+  }
+  .quantity-controls button {
+    margin: 0 5px;
+  }
+  .modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-content {
+    position: relative; /* Added for close button positioning */
+    background-color: #fefefe;
+    margin: auto;
+    padding: 0; /* Removed padding to allow full width and height */
+    border: none; /* Removed border */
+    width: 100vw; /* Full viewport width */
+    height: 100vh; /* Full viewport height */
+    box-sizing: border-box; /* Added to include padding and border in the element's total width and height */
+  }
+  .close {
+    color: #aaa;
+    position: absolute; /* Positioning close button */
+    top: 10px;
+    right: 25px;
+    font-size: 35px;
+    font-weight: bold;
+  }
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  #cart-button {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div id="menu">
+  <!-- Item example -->
+  <div class="item">
+    <img src="NEW Lemonade.jpg" alt="Lemonade" width="100" height="100">
+    <p>Лимонада - <span id="price-Лимонада">2.50</span>лв</p>
+    <div class="quantity-controls">
+      <button onclick="updateItemQuantity('Лимонада', -1)">-</button>
+      <span id="quantity-Лимонада">0</span>
+      <button onclick="updateItemQuantity('Лимонада', 1)">+</button>
+    </div>
+  </div>
+  <!-- Repeat for other items with their respective prices and IDs -->
+</div>
+
+<div id="menu">
+    <!-- Item example -->
+    <div class="item">
+      <img src="NEW Cookies.jpg" alt="Бисквити" width="100" height="100">
+      <p>Бисквити - <span id="price-Бисквити">2.00</span>лв</p>
+      <div class="quantity-controls">
+        <button onclick="updateItemQuantity('Бисквити', -1)">-</button>
+        <span id="quantity-Бисквити">0</span>
+        <button onclick="updateItemQuantity('Бисквити', 1)">+</button>
+      </div>
+    </div>
+    <!-- Repeat for other items with their respective prices and IDs -->
+  </div>
+
+  <div id="menu">
+    <!-- Item example -->
+    <div class="item">
+      <img src="Ice Tea.png" alt="Студен Чай" width="100" height="100">
+      <p>Студен Чай - <span id="price-Студен Чай">2.50</span>лв</p>
+      <div class="quantity-controls">
+        <button onclick="updateItemQuantity('Студен Чай', -1)">-</button>
+        <span id="quantity-Студен Чай">0</span>
+        <button onclick="updateItemQuantity('Студен Чай', 1)">+</button>
+      </div>
+    </div>
+    <!-- Repeat for other items with their respective prices and IDs -->
+  </div>
+
+  <div id="menu">
+    <!-- Item example -->
+    <div class="item">
+      <img src="Sok ot buz.png" alt="Сок от бъз" width="100" height="100">
+      <p>Сок от бъз - <span id="price-Сок от бъз">2.50</span>лв</p>
+      <div class="quantity-controls">
+        <button onclick="updateItemQuantity('Сок от бъз', -1)">-</button>
+        <span id="quantity-Сок от бъз">0</span>
+        <button onclick="updateItemQuantity('Сок от бъз', 1)">+</button>
+      </div>
+    </div>
+    <!-- Repeat for other items with their respective prices and IDs -->
+  </div>
+
+<button id="cart-button" onclick="openModal()">Кошница</button>
+
+<div id="cartModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">×</span>
+      <h2>Кошница</h2>
+      <div id="cart-items">
+        <!-- Cart items will be listed here -->
+      </div>
+      <p id="cart-total-price">Общо: </p>
+    </div>
+  </div>
+
+<script>
+  var cart = {};
+  var prices = {
+    'Лимонада': 2.50,
+    'Бисквити': 2.00,
+    'Студен Чай': 2.50,
+    'Сок от бъз': 2.50,
+    // Add other items and their prices here
+  };
+
+  function updateItemQuantity(itemName, change) {
+    if (!cart[itemName]) {
+      cart[itemName] = 0;
+    }
+    cart[itemName] += change;
+    if (cart[itemName] < 0) {
+      cart[itemName] = 0;
+    }
+    document.getElementById('quantity-' + itemName).textContent = cart[itemName];
+    updateCartDisplay();
+  }
+
+  function openModal() {
+    document.getElementById('cartModal').style.display = 'block';
+    updateCartDisplay();
+  }
+
+  function closeModal() {
+    document.getElementById('cartModal').style.display = 'none';
+  }
+
+  function updateCartDisplay() {
+    var cartItems = '';
+    var totalPrice = 0;
+    for (var item in cart) {
+      if (cart[item] > 0) {
+        var itemPrice = cart[item] * prices[item];
+        cartItems += '<p>' + item + ' x ' + cart[item] + ' - ' + itemPrice.toFixed(2) + 'лв</p>';
+        totalPrice += itemPrice;
+      }
+    }
+    document.getElementById('cart-items').innerHTML = cartItems;
+    document.getElementById('cart-total-price').textContent = 'Общо: ' + totalPrice.toFixed(2) + 'лв';
+  }
+</script>
+
+</body>
+</html>
